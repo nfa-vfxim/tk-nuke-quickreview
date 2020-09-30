@@ -314,14 +314,14 @@ class Dialog(QtGui.QWidget):
 
         # render everything - default to using the first view on stereo
         logger.debug("Rendering quicktime")
-        #try:
-        #    first_view = nuke.views()[0]
-        #    nuke.executeMultiple(
-        #        [mov_out], ([start_frame - 1, end_frame, 1],), [first_view]
-        #    )
-        #finally:
+        try:
+            first_view = nuke.views()[0]
+            nuke.executeMultiple(
+                [mov_out], ([start_frame - 1, end_frame, 1],), [first_view]
+            )
+        finally:
             # turn off the nodes again
-        #    mov_out.knob("disable").setValue(True)
+            mov_out.knob("disable").setValue(True)
 
     def _navigate_panel_and_close(self, panel_app, version_id):
         """
