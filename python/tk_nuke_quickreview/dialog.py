@@ -201,7 +201,7 @@ class Dialog(QtGui.QWidget):
         font_regular = os.path.join(
             self._bundle.disk_location, "resources", "OpenSans-Regular.ttf"
         )
-        font_regular = font.replace(os.sep, "/")
+        font_regular = font_regular.replace(os.sep, "/")
         #self._group_node.node("top_left_text")["font"].setValue(font_regular)
         #self._group_node.node("top_right_text")["font"].setValue(font_regular)
         #self._group_node.node("bottom_left_text")["font"].setValue(font_regular)
