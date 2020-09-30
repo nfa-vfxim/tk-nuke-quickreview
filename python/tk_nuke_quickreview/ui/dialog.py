@@ -137,7 +137,7 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QtGui.QApplication.translate("Dialog", "Shotgun Publish", None, QtGui.QApplication.UnicodeUTF8))
         self.version_name_label.setText(QtGui.QApplication.translate("Dialog", "Name:", None, QtGui.QApplication.UnicodeUTF8))
-        self.description_label.setText(QtGui.QApplication.translate("Dialog", "Description:", None, QtGui.QApplication.UnicodeUTF8))
+        self.description_label.setText(QtGui.QApplication.translate("Dialog", "Notes:", None, QtGui.QApplication.UnicodeUTF8))
         self.frame_range.setText(QtGui.QApplication.translate("Dialog", "Frame Range:", None, QtGui.QApplication.UnicodeUTF8))
         self.frame_range_to.setText(QtGui.QApplication.translate("Dialog", "to", None, QtGui.QApplication.UnicodeUTF8))
         self.label_8.setText(QtGui.QApplication.translate("Dialog", "Version Creation Complete!", None, QtGui.QApplication.UnicodeUTF8))

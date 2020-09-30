@@ -198,15 +198,15 @@ class Dialog(QtGui.QWidget):
         :param str sg_version_name: Name of the version.
         """
         # set the fonts for all text fields
-        font = os.path.join(
+        font_regular = os.path.join(
             self._bundle.disk_location, "resources", "OpenSans-Regular.ttf"
         )
-        font = font.replace(os.sep, "/")
-        self._group_node.node("top_left_text")["font"].setValue(font)
-        self._group_node.node("top_right_text")["font"].setValue(font)
-        self._group_node.node("bottom_left_text")["font"].setValue(font)
-        self._group_node.node("framecounter")["font"].setValue(font)
-        self._group_node.node("slate_info")["font"].setValue(font)
+        font_regular = font.replace(os.sep, "/")
+        #self._group_node.node("top_left_text")["font"].setValue(font_regular)
+        #self._group_node.node("top_right_text")["font"].setValue(font_regular)
+        #self._group_node.node("bottom_left_text")["font"].setValue(font_regular)
+        #self._group_node.node("framecounter")["font"].setValue(font_regular)
+        #self._group_node.node("slate_info")["font"].setValue(font_regular)
 
         # get burnins and slate info from hook
         fields_dict = self._bundle.execute_hook_method(
@@ -218,6 +218,12 @@ class Dialog(QtGui.QWidget):
         )
 
         # set up burnins
+        self._group_node.node("bottom_center_text")["message"].setValue(
+            fields_dict["project_name"]
+        )
+        self._group_node.node("slate_projectinfo")["message"].setValue(
+            fields_dict["project_name"]
+        )
         self._group_node.node("top_left_text")["message"].setValue(
             fields_dict["top_left"]
         )
@@ -227,11 +233,28 @@ class Dialog(QtGui.QWidget):
         self._group_node.node("bottom_left_text")["message"].setValue(
             fields_dict["bottom_left"]
         )
+
         # note: bottom right is used as a frame counter.
+
+        slate_items = fields_dict["slate"]
+
+
+        start_frame = self.ui.start_frame.text()
+        end_frame = self.ui.end_frame.text()
+
+        frame_list = start_frame + " - " + end_frame
+
+        notes = self.ui.description.toPlainText()
+
+        for i in range(len(slate_items)):
+            if slate_items[i] == 'frame_list_placeholder':
+                slate_items[i] = frame_list
+            if slate_items[i] == 'notes_placeholder':
+                slate_items[i] = notes
 
         # set up slate
         self._group_node.node("slate_info")["message"].setValue(
-            "\n".join(fields_dict["slate"])
+            "\n".join(slate_items)
         )
 
     @sgtk.LogManager.log_timing
@@ -252,14 +275,31 @@ class Dialog(QtGui.QWidget):
             base_class=self._bundle.base_hooks.ReviewSettings,
         )
 
-        mov_reformat_node = self._group_node.node("mov_reformat")
-        mov_reformat_node["box_width"].setValue(width)
-        mov_reformat_node["box_height"].setValue(height)
+        #mov_reformat_node = self._group_node.node("mov_reformat")
+        #mov_reformat_node["box_width"].setValue(width)
+        #mov_reformat_node["box_height"].setValue(height)
 
         # setup output quicktime path
         mov_out = self._group_node.node("mov_writer")
         mov_path = mov_path.replace(os.sep, "/")
         mov_out["file"].setValue(mov_path)
+
+        # setting output colorspace
+        colorspace = nuke.root().knob('colorManagement').getValue()
+
+        # If OCIO is set, output - rec709
+        if colorspace:
+            mov_out.knob('colorspace').setValue('Output - Rec.709')
+
+        # If no OCIO is set, detect if ACES is used or nuke_default
+        else:
+            ocio_config = nuke.root().knob('OCIO_config').getValue()
+
+            if ocio_config == 2.0:
+                mov_out.knob('colorspace').setValue('rec709')
+
+            else:
+                mov_out.knob('colorspace').setValue('Output - Rec.709')
 
         # apply the Write node codec settings we'll use for generating the Quicktime
         self._bundle.execute_hook_method(
@@ -274,14 +314,14 @@ class Dialog(QtGui.QWidget):
 
         # render everything - default to using the first view on stereo
         logger.debug("Rendering quicktime")
-        try:
-            first_view = nuke.views()[0]
-            nuke.executeMultiple(
-                [mov_out], ([start_frame - 1, end_frame, 1],), [first_view]
-            )
-        finally:
+        #try:
+        #    first_view = nuke.views()[0]
+        #    nuke.executeMultiple(
+        #        [mov_out], ([start_frame - 1, end_frame, 1],), [first_view]
+        #    )
+        #finally:
             # turn off the nodes again
-            mov_out.knob("disable").setValue(True)
+        #    mov_out.knob("disable").setValue(True)
 
     def _navigate_panel_and_close(self, panel_app, version_id):
         """
